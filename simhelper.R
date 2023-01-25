@@ -7,7 +7,7 @@ sim.fun <- function(b, b_grid=0, dgm='graded', dam=NULL, n_i=25, n_p=500){
 
   make.resp <- function(b, b_grid, dgm, n_i, n_p){
 
-    thetas <- rnorm(n_resp)
+    thetas <- rnorm(n_p)
 
     if(dgm == 'graded'){
       pars <- sort(c(b, b_grid), decreasing=TRUE)
