@@ -53,7 +53,7 @@ clusterSetRNGStream(cl, 1337)
 clusterExport(cl, c('sim.fun', 'imv', 'imv_c', 'imv_t'))
 sim_out <- clusterMap(cl, sim.fun,
                       b=control$b,
-                      b_fixed=0,
+                      b_grid=0,
                       dgm='graded',
                       dam='gpcm',
                       n_i=50,

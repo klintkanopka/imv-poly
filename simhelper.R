@@ -1,35 +1,35 @@
-sim.fun <- function(b, b_fixed=0, dgm='graded', dam=NULL, n_i=25, n_p=500){
+sim.fun <- function(b, b_grid=0, dgm='graded', dam=NULL, n_i=25, n_p=500){
   require(mirt)
 
   if (is.null(dam)){
     dam <- dgm
   }
 
-  make.resp <- function(b=b, b_grid=b_fixed, type=dgm, n_items=n_i, n_resp=n_p){
+  make.resp <- function(b, b_grid, dgm, n_i, n_p){
 
     thetas <- rnorm(n_resp)
 
-    if(type == 'graded'){
+    if(dgm == 'graded'){
       pars <- sort(c(b, b_grid), decreasing=TRUE)
-    } else if(type == 'gpcm'){
+    } else if(dgm == 'gpcm'){
       pars <- sort(c(b, b_grid), decreasing=TRUE)
     }
 
-    par_mat <- c(runif(n_items, min=-1.5, max=1.5), pars[1])
+    par_mat <- c(runif(n_i, min=-1.5, max=1.5), pars[1])
 
     for (i in 2:length(pars)){
-      par_mat <- c(par_mat, rep(NA, n_items), pars[i])
+      par_mat <- c(par_mat, rep(NA, n_i), pars[i])
     }
 
     par_mat <- matrix(par_mat, ncol=length(pars))
 
-    resp <- simdata(a=rep(1, n_items+1),
+    resp <- simdata(a=rep(1, n_i+1),
                     d=par_mat,
-                    itemtype = c(rep('dich', n_items), type),
+                    itemtype = c(rep('dich', n_i), dgm),
                     Theta=thetas)
 
     resp <- data.frame(resp)
-    resp[[paste0('Item_', n_items+2)]] <- ifelse(resp[,ncol(resp)] == 0, 0, 1)
+    resp[[paste0('Item_', n_i+2)]] <- ifelse(resp[,ncol(resp)] == 0, 0, 1)
     return(resp)
   }
 
@@ -37,7 +37,7 @@ sim.fun <- function(b, b_fixed=0, dgm='graded', dam=NULL, n_i=25, n_p=500){
                           "\nFIXED = (", n_i+1,
                           ", a1)\nSTART = (", n_i+1,
                           ", a1, 1.0)"))
-  resp <- make.resp(b)
+  resp <- make.resp(b, b_grid, dgm, n_i, n_p)
   m <- mirt(resp, model=mm, itemtype = c(rep('Rasch', n_i), dam, 'Rasch'))
   th <- fscores(m)
   prob <- data.frame(probtrace(m, th)) # creates matrix of estimated probabilities
@@ -68,38 +68,38 @@ sim.fun <- function(b, b_fixed=0, dgm='graded', dam=NULL, n_i=25, n_p=500){
 }
 
 
-sim.fun.2 <- function(b1, b2, b_fixed=0, dgm='graded', dam=NULL, n_i=25, n_p=500){
+sim.fun.2 <- function(b1, b2, b_grid=0, dgm='graded', dam=NULL, n_i=25, n_p=500){
   require(mirt)
 
   if (is.null(dam)){
     dam <- dgm
   }
 
-  make.resp <- function(b1=b1, b2=b2, b_grid=b_fixed, type=dgm, n_items=n_i, n_resp=n_p){
+  make.resp <- function(b1, b2, b_grid, dgm, n_i, n_p){
 
-    thetas <- rnorm(n_resp)
+    thetas <- rnorm(n_p)
 
-    if(type == 'graded'){
+    if(dgm == 'graded'){
       pars <- sort(c(b1, b2, b_grid), decreasing=TRUE)
-    } else if(type == 'gpcm'){
+    } else if(dgm == 'gpcm'){
       pars <- sort(c(b1, b2, b_grid), decreasing=TRUE)
     }
 
-    par_mat <- c(runif(n_items, min=-1.5, max=1.5), pars[1])
+    par_mat <- c(runif(n_i, min=-1.5, max=1.5), pars[1])
 
     for (i in 2:length(pars)){
-      par_mat <- c(par_mat, rep(NA, n_items), pars[i])
+      par_mat <- c(par_mat, rep(NA, n_i), pars[i])
     }
 
     par_mat <- matrix(par_mat, ncol=length(pars))
 
-    resp <- simdata(a=rep(1, n_items+1),
+    resp <- simdata(a=rep(1, n_i+1),
                     d=par_mat,
-                    itemtype = c(rep('dich', n_items), type),
+                    itemtype = c(rep('dich', n_i), dgm),
                     Theta=thetas)
 
     resp <- data.frame(resp)
-    resp[[paste0('Item_', n_items+2)]] <- ifelse(resp[,ncol(resp)] == 0, 0, 1)
+    resp[[paste0('Item_', n_i+2)]] <- ifelse(resp[,ncol(resp)] == 0, 0, 1)
     return(resp)
   }
 
@@ -107,7 +107,7 @@ sim.fun.2 <- function(b1, b2, b_fixed=0, dgm='graded', dam=NULL, n_i=25, n_p=500
                           "\nFIXED = (", n_i+1,
                           ", a1)\nSTART = (", n_i+1,
                           ", a1, 1.0)"))
-  resp <- make.resp(b)
+  resp <- make.resp(b1, b2, b_grid, dgm, n_i, n_p)
   m <- mirt(resp, model=mm, itemtype = c(rep('Rasch', n_i), dam, 'Rasch'))
   th <- fscores(m)
   prob <- data.frame(probtrace(m, th)) # creates matrix of estimated probabilities
